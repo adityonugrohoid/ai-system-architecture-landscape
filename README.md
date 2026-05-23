@@ -369,7 +369,7 @@ Hello from ai-system-architecture-landscape!
 **Common patterns:** ReAct (Reasoning + Acting), Plan-and-Execute, tool-augmented generation, human-in-the-loop approval
 
 **Architectural considerations:**
-- Agents introduce non-determinism; production deployments require robust error handling and fallbacks
+- Agents introduce non-determinism; production deployments require explicit error handling and fallbacks
 - Tool execution should be sandboxed and audited
 - Start with simpler orchestration before adopting full agents
 
