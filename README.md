@@ -1,74 +1,182 @@
+<div align="center">
+
 # AI System Architecture Landscape
 
-A comprehensive reference for modern AI system components, from data ingestion to user interfaces, across local, hybrid, and cloud deployments.
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Principal-level reference architecture for modern AI systems across local, hybrid, and GCP-native deployments**
+
+[Getting Started](#getting-started) | [Usage](#usage) | [Architecture](#architecture)
+
+</div>
 
 ---
 
 ## Table of Contents
 
-1. [System Overview](#system-overview)
-2. [Data Sources & Ingestion](#1-data-sources--ingestion)
-3. [Data Storage & Object Stores](#2-data-storage--object-stores)
-4. [Structured Databases](#3-structured-databases)
-5. [Vector Databases & Search](#4-vector-databases--search)
-6. [Embedding Models & Services](#5-embedding-models--services)
-7. [LLM Inference & Model Serving](#6-llm-inference--model-serving)
-8. [Prompting, Context Assembly & RAG Frameworks](#7-prompting-context-assembly--rag-frameworks)
-9. [Agent & Orchestration Frameworks](#8-agent--orchestration-frameworks)
-10. [Workflow Automation & Integration Platforms](#9-workflow-automation--integration-platforms)
-11. [Evaluation, Guardrails & Safety](#10-evaluation-guardrails--safety)
-12. [Observability, Logging & Monitoring](#11-observability-logging--monitoring)
-13. [API Gateways & Backend Services](#12-api-gateways--backend-services)
-14. [Chat, UI & End-User Applications](#13-chat-ui--end-user-applications)
-15. [Coding & Developer Productivity Tools](#14-coding--developer-productivity-tools)
-16. [Deployment, Runtime & Infrastructure Layers](#15-deployment-runtime--infrastructure-layers)
+- [The Problem](#the-problem)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Landscape Reference](#landscape-reference)
+  - [1. Data Sources and Ingestion](#1-data-sources-and-ingestion)
+  - [2. Data Storage and Object Stores](#2-data-storage-and-object-stores)
+  - [3. Structured Databases](#3-structured-databases)
+  - [4. Vector Databases and Search](#4-vector-databases-and-search)
+  - [5. Embedding Models and Services](#5-embedding-models-and-services)
+  - [6. LLM Inference and Model Serving](#6-llm-inference-and-model-serving)
+  - [7. RAG Frameworks and Context Assembly](#7-rag-frameworks-and-context-assembly)
+  - [8. Agent and Orchestration Frameworks](#8-agent-and-orchestration-frameworks)
+  - [9. Workflow Automation and Integration Platforms](#9-workflow-automation-and-integration-platforms)
+  - [10. Evaluation, Guardrails, and Safety](#10-evaluation-guardrails-and-safety)
+  - [11. Observability, Logging, and Monitoring](#11-observability-logging-and-monitoring)
+  - [12. API Gateways and Backend Services](#12-api-gateways-and-backend-services)
+  - [13. Chat, UI, and End-User Applications](#13-chat-ui-and-end-user-applications)
+  - [14. Coding and Developer Productivity Tools](#14-coding-and-developer-productivity-tools)
+  - [15. Deployment, Runtime, and Infrastructure](#15-deployment-runtime-and-infrastructure)
+- [Appendix](#appendix)
+- [Architectural Decisions](#architectural-decisions)
+- [Project Structure](#project-structure)
+- [License](#license)
+- [Author](#author)
 
----
+## The Problem
 
-## System Overview
+### Fragmented AI stack knowledge
+
+Modern AI systems span 15+ component categories (ingestion, vector search, embedding, inference, orchestration, observability, and more), each with 3-8 viable tool options. Choosing a stack without a cross-layer view leads to incompatible choices, missed trade-offs, and costly re-architecture.
+
+### The Solution
+
+This landscape maps every layer of a production-grade AI system with tool comparisons, selection criteria, and layer dependency charts. Three deployment variants (local parity, hybrid GCP, full GCP-native) let practitioners match stack choices to their scale and cost constraints from day one.
+
+## Features
+
+- **15-category layer taxonomy** - covers every component from raw data ingestion through end-user UI, with architectural role and interaction model per layer
+- **Tool comparison tables** - head-to-head on abstraction level, composability, and deployment mode for vector databases, embedding models, LLM servers, RAG frameworks, and more
+- **Three deployment variants** - local parity (Ollama + ChromaDB + MinIO), hybrid GCP (Cloud Run + open-source models), and full GCP-native (Vertex AI Gemini + Vector Search) with migration paths between them
+- **Layer dependency matrix** - maps which layers feed which, so you can reason about blast radius before choosing tools
+- **OpenAI-compatible API contract** - articulates the interface boundary that enables provider switching without application rewrites
+- **Minimal viable stack recommendation** - Ollama + SentenceTransformers + FAISS/Chroma + LlamaIndex + FastAPI + Open WebUI for most enterprise knowledge use cases
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Language | Python 3.12+ |
+| Runtime packaging | pyproject.toml (uv / pip) |
+| Reference variants | Local (Ollama, ChromaDB, MinIO), Hybrid GCP (Cloud Run, vLLM, FAISS), Full GCP-native (Vertex AI, Cloud Storage, Gemini) |
+
+## Architecture
+
+The diagram below shows the canonical data and control flow across all 15 landscape layers. The landscape documents detail tool options at each node.
+
+```mermaid
+graph TD
+    Sources["Data Sources\n(PDFs, APIs, DBs, web)"]
+    Storage["Object Storage\n(MinIO / GCS / S3)"]
+    Embedding["Embedding Service\n(SentenceTransformers / Vertex AI)"]
+    VectorDB["Vector Database\n(FAISS / Chroma / Pinecone)"]
+    LLMServing["LLM Inference Server\n(Ollama / vLLM / Gemini API)"]
+    RAG["RAG Framework\n(LlamaIndex / LangChain / Haystack)"]
+    Agents["Agent Orchestration\n(ReAct / Plan-and-Execute)"]
+    Guardrails["Evaluation and Guardrails\n(input/output filters, LLM-as-judge)"]
+    Observability["Observability\n(logs, traces, token usage)"]
+    Backend["API Gateway / Backend\n(FastAPI + Kong / Apigee)"]
+    UI["Chat UI / End-User App\n(Open WebUI / Streamlit / Onyx)"]
+
+    Sources --> Storage
+    Storage --> Embedding
+    Embedding --> VectorDB
+    VectorDB --> RAG
+    LLMServing --> RAG
+    LLMServing --> Agents
+    RAG --> Guardrails
+    Agents --> Guardrails
+    Guardrails --> Backend
+    Guardrails --> Observability
+    Backend --> UI
+
+    style Sources fill:#0f3460,color:#fff
+    style Storage fill:#0f3460,color:#fff
+    style Embedding fill:#16213e,color:#fff
+    style VectorDB fill:#16213e,color:#fff
+    style LLMServing fill:#533483,color:#fff
+    style RAG fill:#533483,color:#fff
+    style Agents fill:#533483,color:#fff
+    style Guardrails fill:#16213e,color:#fff
+    style Observability fill:#16213e,color:#fff
+    style Backend fill:#0f3460,color:#fff
+    style UI fill:#0f3460,color:#fff
+```
+
+Three deployment variants are documented in `docs/`:
+
+| Variant | Best For | Trade-offs |
+|---------|----------|------------|
+| [Local Parity](docs/architecture-local-parity.md) | Development, demos, privacy-sensitive workloads | Single-user, no HA, hardware-limited |
+| [Hybrid GCP](docs/architecture-hybrid.md) | Cost-conscious production MVPs | Some ops overhead, medium scale |
+| [Full GCP-Native](docs/architecture-gcp-native.md) | Enterprise production, regulated industries | Higher cost, maximum scale and reliability |
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.12+
+- No additional runtime dependencies (reference repo)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/adityonugrohoid/ai-system-architecture-landscape.git
+   cd ai-system-architecture-landscape
+   ```
+
+2. Optional: set up a virtual environment to run `main.py`:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   ```
+
+## Usage
+
+Browse the landscape reference below, or open the deployment variant docs in `docs/` for per-architecture implementation guides.
+
+To run the placeholder entry point:
+
+```bash
+python main.py
+```
+
+Expected output:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                              END-USER APPLICATIONS                                  │
-│                    Chat UIs │ Web Apps │ APIs │ Developer Tools                     │
-├─────────────────────────────────────────────────────────────────────────────────────┤
-│                              API GATEWAY / BACKEND                                  │
-├───────────────────────────────┬─────────────────────────────────────────────────────┤
-│     ORCHESTRATION LAYER       │           EVALUATION & SAFETY                       │
-│  Agents │ Workflows │ RAG     │     Guardrails │ Logging │ Observability            │
-├───────────────────────────────┴─────────────────────────────────────────────────────┤
-│                              AI INFERENCE LAYER                                     │
-│              LLM Serving │ Embedding Services │ Model APIs                          │
-├─────────────────────────────────────────────────────────────────────────────────────┤
-│                              DATA LAYER                                             │
-│        Vector DBs │ Structured DBs │ Object Storage │ Document Stores               │
-├─────────────────────────────────────────────────────────────────────────────────────┤
-│                              INFRASTRUCTURE                                         │
-│                 Containers │ Orchestration │ Cloud Platforms                        │
-└─────────────────────────────────────────────────────────────────────────────────────┘
+Hello from ai-system-architecture-landscape!
 ```
 
----
+## Landscape Reference
 
-## 1. Data Sources & Ingestion
+### 1. Data Sources and Ingestion
 
-### Architectural Role
-The entry point for all information that will be processed, embedded, or retrieved by the AI system. Handles extraction, transformation, and normalization of raw content into processable formats.
+**Architectural role:** Entry point for all information processed, embedded, or retrieved by the AI system. Handles extraction, transformation, and normalization into processable formats.
 
-### Problem Solved
-Converts heterogeneous source material (documents, APIs, databases, web content) into structured, chunked content suitable for embedding and retrieval.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
-| Required | Mandatory for RAG; Optional for pure chat |
-| State | Stateless (processing) or Event-driven (streaming) |
-| Interaction | Feeds → Storage Layer, Embedding Services |
+| Required | Mandatory for RAG; optional for pure chat |
+| State | Stateless (processing) or event-driven (streaming) |
+| Feeds into | Storage layer, embedding services |
 
-### Common Data Sources
+**Common source types:**
 
-| Source Type | Examples |
+| Source type | Examples |
 |-------------|----------|
 | Documents | PDF, DOCX, Markdown, HTML |
 | Structured | SQL databases, CSV, JSON |
@@ -76,103 +184,73 @@ Converts heterogeneous source material (documents, APIs, databases, web content)
 | Real-time | APIs, webhooks, message queues |
 | Web | Scraped content, RSS feeds |
 
-### Processing Stages
-1. **Extraction** - Parse raw content from source format
-2. **Cleaning** - Remove noise, normalize encoding
-3. **Chunking** - Split into retrieval-appropriate segments
-4. **Metadata enrichment** - Add source, timestamp, tags
+**Processing stages:** extraction -> cleaning -> chunking -> metadata enrichment
 
----
+### 2. Data Storage and Object Stores
 
-## 2. Data Storage & Object Stores
+**Architectural role:** Persistent storage for raw documents, processed artifacts, model weights, and system assets.
 
-### Architectural Role
-Persistent storage for raw documents, processed artifacts, model weights, and system assets. Serves as the foundational data tier.
-
-### Problem Solved
-Provides durable, scalable storage for unstructured data that does not fit relational models. Enables separation of compute and storage.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Mandatory |
 | State | Stateful (persistent) |
-| Interaction | Receives from → Ingestion; Serves → Embedding, Retrieval |
+| Feeds into | Embedding, retrieval layers |
 
-### Tool Comparison
+**Tool comparison:**
 
-| Tool | Description | Deployment | Abstraction |
-|------|-------------|------------|-------------|
-| **MinIO** | S3-compatible object storage for self-hosted deployments. Drop-in replacement for AWS S3 APIs. | Local/Hybrid | Low |
-| **AWS S3** | Managed object storage with tiered pricing and lifecycle policies. Industry standard for cloud storage. | Cloud (AWS) | Mid |
-| **Google Cloud Storage (GCS)** | Managed object storage with strong consistency and multi-region support. Native integration with GCP services. | Cloud (GCP) | Mid |
+| Tool | Deployment | Abstraction |
+|------|------------|-------------|
+| MinIO | Local / Hybrid | Low - S3-compatible, self-hosted |
+| AWS S3 | Cloud (AWS) | Mid - managed, lifecycle policies |
+| Google Cloud Storage | Cloud (GCP) | Mid - strong consistency, GCP-native |
 
-### Selection Criteria
-- **Local development**: MinIO (S3-compatible, no cloud dependency)
-- **GCP production**: Cloud Storage (native integration, managed)
-- **AWS production**: S3 (ecosystem integration)
-- **Hybrid**: MinIO locally, cloud storage in production
+**Selection criteria:**
+- Local development: MinIO (S3-compatible, no cloud dependency)
+- GCP production: Cloud Storage (native integration, managed)
+- Hybrid: MinIO locally, cloud storage in production
 
----
+### 3. Structured Databases
 
-## 3. Structured Databases
+**Architectural role:** ACID-compliant storage for user accounts, session state, document metadata, audit logs, and application configuration.
 
-### Architectural Role
-Stores relational and transactional data: user accounts, session state, document metadata, audit logs, and application configuration.
-
-### Problem Solved
-Provides ACID-compliant storage for data requiring consistency guarantees, complex queries, and referential integrity.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
-| Required | Situational (depends on application needs) |
+| Required | Situational |
 | State | Stateful (persistent, transactional) |
-| Interaction | Accessed by → Backend Services, Orchestration Layer |
+| Accessed by | Backend services, orchestration layer |
 
-### Common Use Cases in AI Systems
-- User management and authentication
-- Document metadata and indexing status
-- Query logs and analytics
-- Configuration and feature flags
-- Audit trails and compliance records
+**Typical choices:**
+- PostgreSQL - full-featured, open-source, supports pgvector extension
+- SQLite - embedded, zero-config, suitable for local development
+- Cloud SQL / RDS - managed relational databases for production
 
-### Typical Choices
-- **PostgreSQL** - Full-featured, open-source, supports vector extensions (pgvector)
-- **SQLite** - Embedded, zero-config, suitable for local development
-- **Cloud SQL / RDS** - Managed relational databases for production
+### 4. Vector Databases and Search
 
----
+**Architectural role:** Stores and indexes vector embeddings for similarity search. The core retrieval layer for RAG systems.
 
-## 4. Vector Databases & Search
-
-### Architectural Role
-Stores and indexes vector embeddings for similarity search. The core retrieval layer for RAG systems.
-
-### Problem Solved
-Enables semantic search over unstructured data. Finds contextually relevant documents based on meaning rather than keywords.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
-| Required | Mandatory for RAG systems |
+| Required | Mandatory for RAG |
 | State | Stateful (persistent index) |
-| Interaction | Receives from → Embedding Services; Serves → RAG/Orchestration Layer |
+| Feeds into | RAG / orchestration layer |
 
-### Tool Comparison
+**Tool comparison:**
 
-| Tool | Description | Type | Abstraction | Composability |
-|------|-------------|------|-------------|---------------|
-| **FAISS** | Facebook's library for efficient similarity search. In-memory or disk-backed. No server component. | Library | Low | Composable |
-| **Chroma** | Lightweight, developer-friendly vector database. Embedded or client-server mode. | DB | Mid | Composable |
-| **Milvus** | Distributed vector database for production scale. Cloud-native architecture. | DB | Mid | Opinionated |
-| **Weaviate** | Vector database with built-in ML modules and GraphQL API. Supports hybrid search. | DB | High | Opinionated |
-| **Pinecone** | Fully managed vector database service. Zero infrastructure management. | Managed | High | Opinionated |
+| Tool | Type | Abstraction | Composability |
+|------|------|-------------|---------------|
+| FAISS | Library | Low | Composable |
+| Chroma | DB | Mid | Composable |
+| Milvus | DB (distributed) | Mid | Opinionated |
+| Weaviate | DB (GraphQL + ML modules) | High | Opinionated |
+| Pinecone | Managed | High | Opinionated |
 
-### Selection Criteria
+**Selection criteria:**
 
 | Scenario | Recommended |
 |----------|-------------|
@@ -181,83 +259,64 @@ Enables semantic search over unstructured data. Finds contextually relevant docu
 | Production, managed | Pinecone, Vertex AI Vector Search |
 | Hybrid (cloud infra, open-source) | FAISS on Cloud Run |
 
----
+### 5. Embedding Models and Services
 
-## 5. Embedding Models & Services
+**Architectural role:** Converts text (or other modalities) into dense vector representations for semantic search.
 
-### Architectural Role
-Converts text (or other modalities) into dense vector representations for semantic search and similarity comparison.
-
-### Problem Solved
-Creates numerical representations of meaning that enable approximate nearest neighbor search on unstructured content.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Mandatory for RAG and semantic search |
 | State | Stateless (inference only) |
-| Interaction | Receives from → Ingestion, Query Processing; Outputs to → Vector DB |
+| Outputs to | Vector DB |
 
-### Tool Comparison
+**Tool comparison:**
 
-| Tool | Description | Deployment | Abstraction |
-|------|-------------|------------|-------------|
-| **SentenceTransformers** | Python library for state-of-the-art sentence embeddings. Supports fine-tuning. | Local/Self-hosted | Low |
-| **BGE (BAAI General Embedding)** | High-quality multilingual embeddings. Available in multiple sizes. | Local/Self-hosted | Low |
-| **OpenAI Embeddings** | Managed embedding API with text-embedding-3-small/large models. | Managed API | High |
-| **Vertex AI Embeddings** | Google's managed embedding service. Multiple model variants available. | Managed (GCP) | High |
+| Tool | Deployment | Abstraction |
+|------|------------|-------------|
+| SentenceTransformers | Local / self-hosted | Low - fine-tunable, open source |
+| BGE (BAAI General Embedding) | Local / self-hosted | Low - multilingual, multiple sizes |
+| OpenAI Embeddings (text-embedding-3) | Managed API | High - pay-per-token |
+| Vertex AI Embeddings | Managed (GCP) | High - multiple model variants |
 
-### Key Considerations
-- **Dimension consistency** - Embedding dimensions must match across ingestion and query time
-- **Model versioning** - Changing embedding models requires re-indexing all documents
-- **Compute requirements** - Self-hosted models require GPU for efficient batch processing
+**Key constraints:**
+- Embedding dimensions must match across ingestion and query time
+- Changing embedding models requires re-indexing all documents
+- Self-hosted models benefit from GPU for batch processing
 
----
+### 6. LLM Inference and Model Serving
 
-## 6. LLM Inference & Model Serving
+**Architectural role:** The generative core. Executes language model inference and abstracts model loading, batching, and hardware management from application code.
 
-### Architectural Role
-Provides language model inference capabilities. The generative core that produces responses, summaries, and completions.
+**Critical pattern:** LLMs are deployed as long-running inference servers, not loaded per request. Models load into GPU memory at container startup and serve multiple requests via HTTP.
 
-### Problem Solved
-Executes language model inference at scale. Abstracts model loading, batching, and hardware management from application code.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Mandatory |
-| State | Long-running (models loaded in memory) |
-| Interaction | Receives from → Orchestration Layer; Returns → Generated text |
+| State | Long-running (model in memory) |
+| Receives from | Orchestration layer |
 
-### Critical Architecture Note
+**Self-hosted tool comparison:**
 
-> **LLMs are deployed as long-running inference servers, not loaded per request.**
-> Models are loaded into GPU memory at container/process startup and serve multiple requests.
-> All communication occurs via HTTP API calls to the inference endpoint.
+| Tool | Deployment | Abstraction | Composability |
+|------|------------|-------------|---------------|
+| Ollama | Local | High | Opinionated |
+| vLLM | Self-hosted | Low - PagedAttention, high throughput | Composable |
+| Hugging Face TGI | Self-hosted | Mid - Docker-native | Composable |
+| llama.cpp | Local | Low - GGUF, minimal deps | Composable |
 
-### Tool Comparison
+**Managed alternatives:**
 
-| Tool | Description | Deployment | Abstraction | Composability |
-|------|-------------|------------|-------------|---------------|
-| **Ollama** | Local LLM runner with model management. Simple CLI and API. | Local | High | Opinionated |
-| **vLLM** | High-throughput LLM serving with PagedAttention. Production-grade performance. | Self-hosted | Low | Composable |
-| **Hugging Face TGI** | Text Generation Inference server. Docker-native, production-ready. | Self-hosted | Mid | Composable |
-| **llama.cpp** | CPU/GPU inference engine for GGUF models. Minimal dependencies. | Local | Low | Composable |
-| **LM Studio** | Desktop application for running local LLMs. GUI-based model management. | Local | High | Opinionated |
+| Platform | Provider |
+|----------|----------|
+| Vertex AI (Gemini) | GCP |
+| AWS Bedrock (Claude, Titan, Llama) | AWS |
+| Azure AI Studio | Azure |
 
-### Managed Alternatives
-
-| Platform | Description | Provider |
-|----------|-------------|----------|
-| **Vertex AI (Gemini)** | Google's managed LLM API. Pay-per-token, no infrastructure. | GCP |
-| **AWS Bedrock** | Multi-model managed inference. Claude, Titan, and partner models. | AWS |
-| **Azure AI Studio** | Microsoft's managed AI platform. OpenAI models and Azure integration. | Azure |
-
-### API Compatibility Layer
-
-All inference servers should expose **OpenAI-compatible API endpoints**:
+**OpenAI-compatible API endpoints** (all self-hosted servers should expose):
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -265,39 +324,28 @@ All inference servers should expose **OpenAI-compatible API endpoints**:
 | `/v1/completions` | POST | Text completion |
 | `/v1/models` | GET | List available models |
 
-This standardized interface enables:
-- Model switching without code changes
-- Provider substitution (local ↔ cloud)
-- Consistent testing and development workflows
+### 7. RAG Frameworks and Context Assembly
 
----
+**Architectural role:** Orchestrates the retrieval-augmented generation pipeline: query processing, context retrieval, prompt construction, and response generation.
 
-## 7. Prompting, Context Assembly & RAG Frameworks
-
-### Architectural Role
-Orchestrates the retrieval-augmented generation pipeline: query processing, context retrieval, prompt construction, and response generation.
-
-### Problem Solved
-Assembles relevant context from retrieval systems and structures prompts for optimal LLM performance. Abstracts RAG complexity from application code.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
-| Required | Mandatory for RAG; Optional for simple chat |
+| Required | Mandatory for RAG; optional for simple chat |
 | State | Stateless (per-request processing) |
-| Interaction | Coordinates → Vector DB, LLM, Embedding Services |
+| Coordinates | Vector DB, LLM, embedding services |
 
-### Tool Comparison
+**Tool comparison:**
 
-| Tool | Description | Abstraction | Composability |
-|------|-------------|-------------|---------------|
-| **LangChain** | Comprehensive framework for LLM application development. Chains, agents, and integrations. | High | Opinionated |
-| **LlamaIndex** | Data framework focused on ingestion, indexing, and retrieval. Strong document processing. | High | Opinionated |
-| **Haystack** | End-to-end NLP framework. Pipeline-based architecture with component modularity. | Mid | Composable |
-| **AnythingLLM** | All-in-one RAG application with built-in UI, storage, and LLM integration. | High | Opinionated |
+| Tool | Abstraction | Composability |
+|------|-------------|---------------|
+| LangChain | High - chains, agents, integrations | Opinionated |
+| LlamaIndex | High - strong document processing | Opinionated |
+| Haystack | Mid - pipeline-based component model | Composable |
+| AnythingLLM | High - all-in-one with built-in UI | Opinionated |
 
-### Framework Selection
+**Selection guidance:**
 
 | Scenario | Recommended |
 |----------|-------------|
@@ -306,505 +354,288 @@ Assembles relevant context from retrieval systems and structures prompts for opt
 | Production pipelines | Haystack, custom implementation |
 | Maximum control | Custom RAG implementation |
 
-### When to Use Frameworks vs. Custom Code
-- **Use frameworks** when: prototyping, standard RAG patterns, team familiarity
-- **Use custom code** when: production optimization, specific retrieval strategies, minimal dependencies
+### 8. Agent and Orchestration Frameworks
 
----
+**Architectural role:** Enables autonomous or semi-autonomous agents that can plan, use tools, and execute multi-step tasks.
 
-## 8. Agent & Orchestration Frameworks
-
-### Architectural Role
-Enables autonomous or semi-autonomous AI agents that can plan, use tools, and execute multi-step tasks.
-
-### Problem Solved
-Extends LLM capabilities beyond single-turn generation to complex, stateful workflows with external tool integration.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Optional (situational) |
-| State | Stateful (session/task state) |
-| Interaction | Coordinates → LLM, Tools, External APIs |
+| State | Stateful (session / task state) |
+| Coordinates | LLM, tools, external APIs |
 
-### Capabilities
-- **Tool use** - LLM decides when and how to call external functions
-- **Planning** - Multi-step task decomposition and execution
-- **Memory** - Persistent context across interactions
-- **Reflection** - Self-evaluation and error correction
+**Common patterns:** ReAct (Reasoning + Acting), Plan-and-Execute, tool-augmented generation, human-in-the-loop approval
 
-### Common Patterns
-- ReAct (Reasoning + Acting)
-- Plan-and-Execute
-- Tool-augmented generation
-- Human-in-the-loop approval
-
-### Architectural Considerations
-- Agents introduce non-determinism and unpredictability
-- Production agents require robust error handling and fallbacks
+**Architectural considerations:**
+- Agents introduce non-determinism; production deployments require robust error handling and fallbacks
 - Tool execution should be sandboxed and audited
-- Consider simpler orchestration before adopting full agents
+- Start with simpler orchestration before adopting full agents
 
----
+### 9. Workflow Automation and Integration Platforms
 
-## 9. Workflow Automation & Integration Platforms
+**Architectural role:** Connects AI capabilities with external systems, triggers, and business processes.
 
-### Architectural Role
-Connects AI capabilities with external systems, triggers, and business processes. Enables event-driven and scheduled AI workflows.
-
-### Problem Solved
-Integrates AI into broader business automation without custom integration code for each system.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Optional (situational) |
 | State | Event-driven or scheduled |
-| Interaction | Triggers → AI services; Outputs → External systems |
+| Triggers | AI services; outputs to external systems |
 
-### Tool Comparison
+**Tool comparison:**
 
-| Tool | Description | Abstraction | Composability |
-|------|-------------|-------------|---------------|
-| **n8n** | Self-hosted workflow automation with visual editor. 350+ integrations. | High | Composable |
-| **Dify** | LLM application development platform with visual workflow builder. | High | Opinionated |
-| **Flowise** | Drag-and-drop LLM flow builder. LangChain-based. | High | Opinionated |
-| **Zapier** | Cloud-native integration platform. 5000+ app connectors. | High | Opinionated |
+| Tool | Description | Abstraction |
+|------|-------------|-------------|
+| n8n | Self-hosted workflow automation, 350+ integrations | High |
+| Dify | LLM application platform with visual workflow builder | High |
+| Flowise | Drag-and-drop LLM flow builder, LangChain-based | High |
+| Zapier | Cloud-native, 5000+ app connectors | High |
 
-### Use Cases
-- Document processing pipelines
-- Email/chat response automation
-- Data enrichment workflows
-- Scheduled report generation
-- Cross-system synchronization
+### 10. Evaluation, Guardrails, and Safety
 
----
+**Architectural role:** Ensures outputs meet quality, safety, and policy requirements. Provides runtime protection and offline evaluation.
 
-## 10. Evaluation, Guardrails & Safety
-
-### Architectural Role
-Ensures AI system outputs meet quality, safety, and policy requirements. Provides runtime protection and offline evaluation.
-
-### Problem Solved
-Prevents harmful, incorrect, or policy-violating outputs. Enables systematic quality measurement and improvement.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Recommended for production |
 | State | Stateless (per-request evaluation) |
-| Interaction | Intercepts → LLM input/output; Reports → Observability |
+| Reports into | Observability layer |
 
-### Types of Controls
+**Control types:**
 
-| Control Type | Timing | Purpose |
-|--------------|--------|---------|
+| Control | Timing | Purpose |
+|---------|--------|---------|
 | Input validation | Pre-inference | Block malicious or invalid prompts |
 | Output filtering | Post-inference | Remove harmful or off-topic content |
 | Retrieval validation | Pre-response | Verify context relevance |
 | Hallucination detection | Post-inference | Flag unsupported claims |
-| PII detection | Pre/Post | Prevent data leakage |
+| PII detection | Pre / post | Prevent data leakage |
 
-### Evaluation Approaches
-- **Automated metrics** - BLEU, ROUGE, semantic similarity
-- **LLM-as-judge** - Use LLM to evaluate responses
-- **Human evaluation** - Manual quality assessment
-- **A/B testing** - Compare system variants in production
+**Evaluation approaches:** automated metrics (BLEU, ROUGE, semantic similarity), LLM-as-judge, human evaluation, A/B testing
 
----
+### 11. Observability, Logging, and Monitoring
 
-## 11. Observability, Logging & Monitoring
+**Architectural role:** Provides visibility into system behavior, performance, and usage.
 
-### Architectural Role
-Provides visibility into system behavior, performance, and usage. Enables debugging, optimization, and operational awareness.
-
-### Problem Solved
-Answers: What happened? Why? How long did it take? What resources were consumed?
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Mandatory for production |
-| State | Stateful (log/metric storage) |
-| Interaction | Receives from → All system components |
+| State | Stateful (log / metric storage) |
+| Receives from | All system components |
 
-### Key Telemetry Types
+**Key telemetry types:**
 
 | Type | Content | Purpose |
 |------|---------|---------|
-| Logs | Request/response, errors, events | Debugging, audit trail |
+| Logs | Request / response, errors, events | Debugging, audit trail |
 | Metrics | Latency, throughput, token usage | Performance monitoring |
 | Traces | Request flow across services | Distributed debugging |
 | Cost tracking | Token consumption, API costs | Budget management |
 
-### AI-Specific Observability Needs
-- Prompt and completion logging (with PII handling)
-- Token usage tracking per request
-- Retrieval quality metrics (relevance scores)
-- Model version and configuration tracking
-- Latency breakdown (retrieval vs. inference)
+**AI-specific needs:** prompt and completion logging (with PII handling), token usage per request, retrieval quality metrics, latency breakdown (retrieval vs. inference), model version tracking
 
----
+### 12. API Gateways and Backend Services
 
-## 12. API Gateways & Backend Services
+**Architectural role:** Exposes AI capabilities as APIs. Handles authentication, rate limiting, routing, and request/response transformation.
 
-### Architectural Role
-Exposes AI capabilities as APIs. Handles authentication, rate limiting, routing, and request/response transformation.
-
-### Problem Solved
-Provides secure, scalable access to AI services. Decouples client applications from backend implementation.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Mandatory for production |
 | State | Stateless (request handling) |
-| Interaction | Receives → Client requests; Routes → AI services |
+| Routes to | AI services |
 
-### Common Components
-- **API Gateway** - Kong, Apigee, Cloud Endpoints
-- **Backend Framework** - FastAPI, Flask, Express
-- **Authentication** - OAuth2, API keys, JWT
-- **Rate limiting** - Per-user, per-tier quotas
+**Common components:**
+- API gateway: Kong, Apigee, Cloud Endpoints
+- Backend framework: FastAPI, Flask, Express
+- Authentication: OAuth2, API keys, JWT
+- Rate limiting: per-user and per-tier quotas
 
-### Backend Service Patterns
-- Stateless request handlers
-- Async job queues for long-running tasks
-- Caching layer for repeated queries
-- Circuit breakers for resilience
+**Backend service patterns:** stateless request handlers, async job queues for long-running tasks, caching layer for repeated queries, circuit breakers for resilience
 
----
+### 13. Chat, UI, and End-User Applications
 
-## 13. Chat, UI & End-User Applications
+**Architectural role:** Provides human interfaces to AI capabilities.
 
-### Architectural Role
-Provides human interfaces to AI capabilities. Chat interfaces, dashboards, and application integrations.
-
-### Problem Solved
-Makes AI capabilities accessible to end users. Handles conversation state, rendering, and user experience.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Mandatory for user-facing systems |
 | State | Stateful (session, conversation history) |
-| Interaction | Communicates with → Backend APIs |
+| Communicates with | Backend APIs |
 
-### Tool Comparison
+**Tool comparison:**
 
-| Tool | Description | Deployment | Abstraction | Composability |
-|------|-------------|------------|-------------|---------------|
-| **Open WebUI** | Self-hosted chat interface for LLMs. Ollama integration. | Self-hosted | High | Opinionated |
-| **Onyx** | Enterprise-grade chat + RAG platform. Document management included. | Self-hosted | High | Opinionated |
-| **Msty** | Desktop chat application for local LLMs. Privacy-focused. | Local | High | Opinionated |
-| **Streamlit** | Python framework for data applications. Rapid prototyping. | Self-hosted | Mid | Composable |
-| **Gradio** | Python library for ML demos. Easy sharing and embedding. | Self-hosted | Mid | Composable |
+| Tool | Deployment | Abstraction | Composability |
+|------|------------|-------------|---------------|
+| Open WebUI | Self-hosted | High - Ollama integration | Opinionated |
+| Onyx | Self-hosted | High - enterprise RAG portal | Opinionated |
+| Msty | Local | High - privacy-focused desktop app | Opinionated |
+| Streamlit | Self-hosted | Mid - rapid Python prototyping | Composable |
+| Gradio | Self-hosted | Mid - ML demos, easy sharing | Composable |
 
-### Selection Criteria
+**Selection criteria:**
 
 | Scenario | Recommended |
 |----------|-------------|
 | Local chat with Ollama | Open WebUI, Msty |
 | Enterprise RAG portal | Onyx, custom application |
 | Rapid prototyping | Streamlit, Gradio |
-| Custom production UI | React/Vue + custom backend |
+| Custom production UI | React / Vue + custom backend |
 
----
+### 14. Coding and Developer Productivity Tools
 
-## 14. Coding & Developer Productivity Tools
+**Architectural role:** AI-assisted development tools that accelerate programmer productivity through code generation, completion, and refactoring.
 
-### Architectural Role
-AI-assisted development tools that enhance programmer productivity. Code generation, completion, and refactoring.
+**Tool comparison:**
 
-### Problem Solved
-Accelerates software development through AI-powered code suggestions, explanations, and transformations.
+| Tool | Integration | Abstraction |
+|------|-------------|-------------|
+| Codex (OpenAI) | API | Low - foundation model for code |
+| Claude Code | CLI / API | Mid - strong reasoning and explanation |
+| OpenCode | CLI | Mid - open-source terminal assistant |
+| Cursor | IDE | High - AI-native code editor |
+| GitHub Copilot | IDE plugin | High - real-time suggestions |
 
-### Layer Characteristics
+### 15. Deployment, Runtime, and Infrastructure
 
-| Aspect | Value |
-|--------|-------|
-| Required | Optional (developer tooling) |
-| State | Session-based |
-| Interaction | Integrates with → IDE, terminal, version control |
+**Architectural role:** Provides the compute, networking, and orchestration foundation for all AI system components.
 
-### Tool Comparison
-
-| Tool | Description | Integration | Abstraction |
-|------|-------------|-------------|-------------|
-| **Codex (OpenAI)** | Foundation model for code generation. Powers various tools and APIs. | API | Low |
-| **Claude Code** | Anthropic's coding assistant. Strong reasoning and explanation. | CLI/API | Mid |
-| **OpenCode** | Open-source terminal-based AI coding assistant. | CLI | Mid |
-| **Cursor** | AI-native code editor. Full IDE with integrated AI features. | IDE | High |
-| **GitHub Copilot** | AI pair programmer. Real-time code suggestions in popular IDEs. | IDE plugin | High |
-
-### Capabilities
-- Line and block completions
-- Natural language to code
-- Code explanation and documentation
-- Refactoring suggestions
-- Test generation
-- Bug detection
-
----
-
-## 15. Deployment, Runtime & Infrastructure Layers
-
-### Architectural Role
-Provides the compute, networking, and orchestration foundation for all AI system components.
-
-### Problem Solved
-Enables scalable, reliable, and cost-effective operation of AI workloads across environments.
-
-### Layer Characteristics
+**Layer characteristics:**
 
 | Aspect | Value |
 |--------|-------|
 | Required | Mandatory |
 | State | Platform-level (stateful infrastructure) |
-| Interaction | Hosts → All application components |
+| Hosts | All application components |
 
-### Infrastructure Layers
+**Infrastructure layers:**
 
 | Layer | Purpose | Tools |
 |-------|---------|-------|
 | Container runtime | Application packaging | Docker, containerd |
 | Orchestration | Scaling, scheduling | Kubernetes, Docker Compose |
 | Serverless | Event-driven compute | Cloud Run, Lambda, Cloud Functions |
-| GPU compute | Model inference | NVIDIA GPUs, Cloud GPU instances |
+| GPU compute | Model inference | NVIDIA GPUs, cloud GPU instances |
 | Storage | Persistent data | Block storage, object stores |
 
-### Tool Comparison
+**Cloud platform comparison:**
 
-| Tool | Description | Deployment | Abstraction |
-|------|-------------|------------|-------------|
-| **Docker** | Container runtime and packaging. Industry standard for application isolation. | Local/Cloud | Low |
-| **Kubernetes** | Container orchestration platform. Production-grade scaling and management. | Self-hosted/Managed | Mid |
-| **Docker Compose** | Multi-container application definition. Local development and simple deployments. | Local | Mid |
-
-### Cloud Platform Comparison
-
-| Platform | LLM Options | Vector Search | Compute |
+| Platform | LLM options | Vector search | Compute |
 |----------|-------------|---------------|---------|
-| **GCP Vertex AI** | Gemini, Model Garden | Vector Search | Cloud Run, GKE |
-| **AWS Bedrock** | Claude, Titan, Llama | OpenSearch | Lambda, EKS |
-| **Azure AI Studio** | OpenAI, Llama | AI Search | AKS, Container Apps |
+| GCP Vertex AI | Gemini, Model Garden | Vector Search | Cloud Run, GKE |
+| AWS Bedrock | Claude, Titan, Llama | OpenSearch | Lambda, EKS |
+| Azure AI Studio | OpenAI, Llama | AI Search | AKS, Container Apps |
 
-### Deployment Patterns
+**Deployment patterns:**
 
-| Pattern | Use Case | Complexity |
+| Pattern | Use case | Complexity |
 |---------|----------|------------|
 | Local (Docker Compose) | Development, demos | Low |
 | Single VM | Small-scale production | Low |
 | Managed serverless | Scalable APIs | Medium |
 | Kubernetes | Enterprise scale | High |
 
----
+## Appendix
 
-## Appendix: Layer Dependency Matrix
+### Layer Dependency Matrix
 
-| Layer | Depends On | Feeds Into |
+| Layer | Depends on | Feeds into |
 |-------|------------|------------|
 | Ingestion | Storage | Embedding, Vector DB |
 | Storage | Infrastructure | All layers |
-| Vector DB | Embedding, Storage | RAG/Orchestration |
-| Embedding | Infrastructure | Vector DB, Query processing |
-| LLM Serving | Infrastructure (GPU) | Orchestration, Agents |
-| RAG Framework | Vector DB, LLM | Backend Services |
-| Agents | LLM, Tools | Backend Services |
+| Vector DB | Embedding, Storage | RAG / Orchestration |
+| Embedding | Infrastructure | Vector DB, query processing |
+| LLM Serving | Infrastructure (GPU) | Orchestration, agents |
+| RAG Framework | Vector DB, LLM | Backend services |
+| Agents | LLM, tools | Backend services |
 | Workflow | All AI services | External systems |
 | Guardrails | LLM I/O | Observability |
 | Observability | All layers | Operations |
-| Backend/API | RAG, LLM, Auth | User Applications |
-| UI/Chat | Backend APIs | End users |
+| Backend / API | RAG, LLM, auth | User applications |
+| UI / Chat | Backend APIs | End users |
 
-```mermaid
-flowchart LR
+### Minimal Viable AI System Stack
 
-    %% Core Infrastructure
-    Infrastructure --> Storage
-    Infrastructure --> Embedding
-    Infrastructure --> LLMServing
+For most enterprise knowledge and internal AI assistant use cases, this stack is sufficient and intentionally minimal:
 
-    %% Ingestion & Storage
-    Storage --> Ingestion
-    Ingestion --> Embedding
-    Ingestion --> VectorDB
+- LLM serving: Ollama or vLLM
+- Embeddings: SentenceTransformers (all-MiniLM-L6-v2, 80 MB) or BGE models
+- Vector database: FAISS or Chroma
+- RAG framework: LlamaIndex
+- API backend: FastAPI
+- User interface: Open WebUI or lightweight web frontend
 
-    %% Embeddings & Vector Search
-    Embedding --> VectorDB
-    Embedding --> QueryProcessing
-    VectorDB --> RAG
+All additional layers (agents, automation platforms, complex UIs) should be introduced only when justified by concrete requirements.
 
-    %% LLM & Intelligence
-    LLMServing --> RAG
-    LLMServing --> Agents
-    LLMServing --> Guardrails
+### Control Plane vs. Data Plane
 
-    %% RAG / Agents / Workflows
-    RAG --> Backend
-    Agents --> Backend
-    Workflow --> ExternalSystems
+**Data plane** (performance-sensitive, stateful, scales with data volume): ingestion, chunking, embedding, vector storage, LLM inference execution.
 
-    %% Guardrails & Observability
-    Guardrails --> Observability
-    Observability --> Operations
+**Control plane** (policy-driven, event-oriented, often optional for early-stage systems): agent frameworks, workflow engines, tool routing, conditional logic.
 
-    %% Backend & UI
-    Backend --> UI
-    UI --> EndUsers
+Design principle: start with a strong data plane. Introduce control-plane complexity only when necessary.
 
-    %% Cross-cutting
-    Storage --> Observability
-    VectorDB --> Observability
-    Backend --> Observability
-```
+### Explicit Non-Goals
 
----
-
-## Appendix: Deployment Variant Reference
-
-| Variant | Best For | Trade-offs |
-|---------|----------|------------|
-| **Local** | Development, learning, demos | Single-user, no HA, hardware-limited |
-| **Hybrid** | Cost-conscious production MVP | Some ops overhead, medium scale |
-| **Full Cloud** | Enterprise production | Higher cost, maximum scale and reliability |
-
----
-
-## Appendix: Architectural Principle: API Compatibility Layer
-
-This architecture adopts the **OpenAI-compatible API specification** as a stable contract
-between application logic and LLM inference backends.
-
-This layer is intentionally treated as a **boundary**, not an implementation detail.
-
-### Why This Matters
-- Decouples application code from model vendors
-- Enables seamless switching between:
-  - Local models
-  - Open-source hosted models
-  - Cloud-managed LLM services
-- Allows cost, latency, and privacy trade-offs without refactoring core logic
-
-### Typical Implementations
-- Local inference servers exposing OpenAI-compatible endpoints:
-  - vLLM
-  - Ollama
-  - Hugging Face Text Generation Inference (TGI)
-- Cloud platforms offering compatible APIs:
-  - OpenAI
-  - Azure OpenAI
-  - Vertex AI (via compatible SDK layers or adapters)
-
-**Non-goal:** achieving perfect feature parity across providers  
-**Goal:** preserving API-level compatibility for core text and embedding workflows
-
----
-
-## Appendix: Control Plane vs Data Plane in AI Systems
-
-This architecture separates concerns into two conceptual planes:
-
-### Data Plane
-Responsible for data movement and transformation:
-- Document ingestion
-- Chunking and embedding
-- Vector storage and retrieval
-- LLM inference execution
-
-Characteristics:
-- Performance-sensitive
-- Often stateful
-- Scales with data volume
-
-### Control Plane
-Responsible for decision-making and orchestration:
-- Agent frameworks
-- Workflow engines
-- Tool routing
-- Conditional logic
-
-Characteristics:
-- Policy-driven
-- Event-oriented
-- Often optional for early-stage systems
-
-**Design Principle:**  
-Start with a strong data plane. Introduce control-plane complexity only when necessary.
-
----
-
-## Appendix: LLM Serving & Model Lifecycle
-
-This system treats LLMs as **runtime services**, not embedded libraries.
-
-### Model Lifecycle Stages
-1. Model acquisition  
-   - Open-source registries (e.g., Hugging Face)
-   - Vendor-managed catalogs
-2. Model storage  
-   - Local disk
-   - Object storage (S3/GCS-compatible)
-3. Runtime serving  
-   - Inference servers expose APIs
-4. Application access  
-   - OpenAI-compatible API calls
-5. Model replacement or upgrade  
-   - No application-layer refactoring required
-
-### Serving Strategies
-- CPU-first / experimentation:
-  - Ollama
-  - llama.cpp
-- GPU-optimized / scalable:
-  - vLLM
-  - Hugging Face TGI
-
-**Explicit Non-Goal:**  
-- Training or fine-tuning large foundation models within this architecture
-
----
-
-## Appendix: Minimal Viable AI System Stack (Reference)
-
-For most enterprise knowledge and internal AI assistant use cases,
-the following stack is sufficient and intentionally minimal:
-
-- LLM Serving: Ollama or vLLM
-- Embeddings: SentenceTransformers or bge models
-- Vector Database: FAISS or Chroma
-- RAG Framework: LlamaIndex
-- API Backend: FastAPI
-- User Interface: Open WebUI or lightweight web frontend
-
-All additional layers (agents, automation platforms, complex UIs)
-should be introduced only when justified by concrete requirements.
-
----
-
-## Appendix: Explicit Non-Goals and Constraints
-
-This architecture intentionally does **not** attempt to solve:
+This landscape intentionally does not cover:
 
 - Training foundation models from scratch
-- Large-scale multimodal generation (image/video)
+- Large-scale multimodal generation (image / video)
 - Ultra-low-latency real-time inference guarantees
 - Autonomous agent swarms without human oversight
 - Vendor-specific lock-in optimizations
 
-These constraints are deliberate to preserve:
-- Portability
-- Cost control
-- Architectural clarity
-- Long-term maintainability
+These constraints preserve portability, cost control, architectural clarity, and long-term maintainability.
 
----
+## Architectural Decisions
 
-*Document Version: 1.0*
-*Last Updated: 2026-01-29*
+### 1. OpenAI-compatible API as the LLM interface boundary
+
+**Decision:** All layers in this landscape treat the OpenAI-compatible API specification (`/v1/chat/completions`, `/v1/completions`, `/v1/models`) as the stable contract between application logic and LLM inference backends.
+
+**Reasoning:** This boundary decouples application code from model vendors and enables switching between local inference servers (Ollama, vLLM, llama.cpp) and cloud-managed APIs (Vertex AI, Azure OpenAI) without refactoring core logic. The trade-off is that provider-specific features (extended context, fine-grained sampling) may require thin adapter layers, but this cost is lower than the lock-in risk.
+
+### 2. Three deployment variants instead of one canonical stack
+
+**Decision:** Document local parity, hybrid GCP, and full GCP-native as peer variants with explicit migration paths between them, rather than recommending a single stack.
+
+**Reasoning:** Organizations differ on cost sensitivity, privacy requirements, and DevOps capacity. A single "correct" stack would be incorrect for most readers. The three-variant model lets teams start at local parity and migrate to hybrid or full GCP-native as requirements evolve. Migration paths (documented in `docs/`) make the upgrade ladder concrete.
+
+### 3. Layer taxonomy over tool lists
+
+**Decision:** Organize the landscape by architectural layer (ingestion, storage, vector search, etc.) rather than by vendor or tool name.
+
+**Reasoning:** Tools change faster than architectural roles. A layer-first view lets practitioners reason about trade-offs (composable vs. opinionated, managed vs. self-hosted) independently of which specific library is current. New tools can be slotted into existing categories without restructuring the reference.
+
+## Project Structure
+
+```
+ai-system-architecture-landscape/
+├── docs/
+│   ├── architecture-local-parity.md   # Local variant: Ollama + ChromaDB + MinIO
+│   ├── architecture-hybrid.md         # Hybrid GCP: Cloud Run + open-source models
+│   └── architecture-gcp-native.md     # Full GCP-native: Vertex AI + managed services
+│
+├── main.py                            # Placeholder entry point
+├── pyproject.toml                     # Python project metadata
+├── LICENSE
+└── README.md
+```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Author
+
+**Adityo Nugroho** ([@adityonugrohoid](https://github.com/adityonugrohoid))
